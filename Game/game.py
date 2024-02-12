@@ -1,13 +1,15 @@
 import pygame
-from models import Spaceship, Asteroid
+from models import Spaceship, Asteroid, Bullet
 from utils import load_sprite, wrap_position, get_random_position
 
 class SpaceRocks:
     MIN_ASTEROID_DISTANCE = 250
+    SCREEN_WIDTH = 1920
+    SCREEN_HEIGHT = 1080
     def __init__(self):
         self._init_pygame()
         # self.screen = pygame.display.set_mode((800, 600))
-        self.screen = pygame.display.set_mode((1920, 1080))
+        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.background = load_sprite("space", False)
         self.clock = pygame.time.Clock()
 
@@ -15,7 +17,7 @@ class SpaceRocks:
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
 
-        for _ in range(1):
+        for _ in range(50):
             while True:
                 position = get_random_position(self.screen)
                 if (
@@ -60,7 +62,12 @@ class SpaceRocks:
 
     def _process_game_logic(self):
         for game_object in self._get_game_objects():
-            game_object.move(self.screen)
+
+            if isinstance(game_object, Bullet):
+                game_object.move_no_wrap()
+            else:
+                game_object.move(self.screen)
+            # if isinstance(game_object, Spaceship): print(game_object.velocity[1])
         
         #check if space ship hits asteroid
         if self.spaceship:
@@ -76,10 +83,6 @@ class SpaceRocks:
                     self.bullets.remove(bullet)
                     asteroid.split()
                     break
-
-        # for bullet in self.bullets[:]:
-        #     if not self.screen.get_rect().collidepoint(bullet.position):
-        #         self.bullets.remove(bullet)    
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
