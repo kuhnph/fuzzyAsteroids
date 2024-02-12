@@ -29,6 +29,12 @@ class GameObject:
         # Updating position based on velocity
         self.position += self.velocity
 
+    def move_no_wrap(self):
+        # Wrapping position around the screen if it goes out of bounds
+        self.position = self.position + self.velocity
+        # Updating position based on velocity
+        self.position += self.velocity
+
     # Method to check collision with another object
     def collides_with(self, other_obj):
         # Calculating distance between this object and another object
@@ -39,8 +45,9 @@ class GameObject:
 # Subclass representing a spaceship, inheriting from GameObject
 class Spaceship(GameObject):
     MANEUVERABILITY = 5   # Rate of rotation
-    ACCELERATION = .3     # Acceleration rate
+    ACCELERATION = .1     # Acceleration rate
     BULLET_SPEED = 3      # Speed of bullets fired from the spaceship
+    DAMPENING = .01
 
     def __init__(self, position, create_bullet_callback):
         # Initializing spaceship attributes
@@ -70,7 +77,7 @@ class Spaceship(GameObject):
     # Method to accelerate the spaceship
     def accelerate(self):
         # Updating velocity based on direction and acceleration rate
-        self.velocity += self.direction * self.ACCELERATION
+        self.velocity += self.direction * self.ACCELERATION - self.velocity*self.DAMPENING
 
     # Method to shoot bullets from the spaceship
     def shoot(self):
