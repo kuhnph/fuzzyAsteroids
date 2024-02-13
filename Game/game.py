@@ -97,3 +97,5 @@ class SpaceRocks:
             game_objects.append(self.spaceship)
         
         return game_objects
+    
+print("magnus")
