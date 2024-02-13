@@ -75,9 +75,9 @@ class Spaceship(GameObject):
         surface.blit(rotated_surface, blit_position)
 
     # Method to accelerate the spaceship
-    def accelerate(self):
+    def accelerate(self, ACCELERATION=ACCELERATION):
         # Updating velocity based on direction and acceleration rate
-        self.velocity += self.direction * self.ACCELERATION - self.velocity*self.DAMPENING
+        self.velocity += self.direction * ACCELERATION - self.velocity*self.DAMPENING
 
     # Method to shoot bullets from the spaceship
     def shoot(self):

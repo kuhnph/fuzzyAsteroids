@@ -17,7 +17,7 @@ class SpaceRocks:
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
 
-        for _ in range(50):
+        for _ in range(0):
             while True:
                 position = get_random_position(self.screen)
                 if (
@@ -67,10 +67,11 @@ class SpaceRocks:
                 game_object.move_no_wrap()
             else:
                 game_object.move(self.screen)
-            # if isinstance(game_object, Spaceship): print(game_object.velocity[1])
+            if isinstance(game_object, Spaceship): print(game_object.velocity[1])
         
         #check if space ship hits asteroid
         if self.spaceship:
+            self.spaceship.accelerate(0)
             for asteroid in self.asteroids:
                 if asteroid.collides_with(self.spaceship):
                     self.spaceship = None
