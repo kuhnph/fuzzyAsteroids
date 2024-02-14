@@ -39,9 +39,7 @@ class GameObject:
     # Method to check collision with another object
     def collides_with(self, other_obj):
         # Calculating distance between this object and another object
-        adj_pos_self = Vector2((self.position[0]+self.radius, self.position[1]+self.radius))
-        adj_pos_other_obj = Vector2((other_obj.position[0]+other_obj.radius, other_obj.position[1]+other_obj.radius))
-        distance = adj_pos_self.distance_to(adj_pos_other_obj)
+        distance = self.position.distance_to(other_obj.position)
         # Checking if the distance is less than the sum of the radii for collision
         return distance < self.radius + other_obj.radius
     
@@ -140,18 +138,20 @@ class Bullet(GameObject):
 
 
 class Target(GameObject):
-    def __init__(self, position, capture_life, damsel):
+    def __init__(self, position, capture_life):
         self.capture_life = capture_life
-        self.damsel = damsel
         # initialize target attributes
-        super().__init__(position, load_sprite("target"), Vector2(0))  # Calling base class constructor
+        self.sprite = rotozoom(load_sprite('target'),0,0.5)
+        super().__init__(position, self.sprite , Vector2(0))  # Calling base class constructor
 
     # Method to draw the target
     def draw(self, surface):
+        # Calculating position for blitting to center the sprite
+        blit_position = self.position - Vector2(self.radius)
         # draw teh capture life
-        text_to_screen(surface, '{:.1f}'.format(self.capture_life), (self.position[0], self.position[1]-50))
+        text_to_screen(surface, '{:.1f}'.format(self.capture_life), (blit_position[0], blit_position[1]-20))
         # Blitting the sprite onto the surface
-        surface.blit(load_sprite("target"), self._position)
+        surface.blit(self.sprite, blit_position)
 
     # capture function
     def capture(self):
@@ -166,7 +166,7 @@ class Target(GameObject):
     def damsel(self, d):
         self._damsel = d #eez nuts
     
-def text_to_screen(surface, text, pos, size = 50, color = 'white', font_type = 'assets/fonts/ubuntu.mono.ttf'):
+def text_to_screen(surface, text, pos, size = 20, color = 'white', font_type = 'assets/fonts/ubuntu.mono.ttf'):
     try:
         text = str(text)
         font = Font(font_type, size)
