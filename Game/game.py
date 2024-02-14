@@ -1,5 +1,5 @@
 import pygame
-from models import Spaceship, Asteroid, Bullet
+from models import Spaceship, Asteroid, Bullet, Peach
 from utils import load_sprite, wrap_position, get_random_position
 
 class SpaceRocks:
@@ -16,12 +16,18 @@ class SpaceRocks:
         self.asteroids = []
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
+        # Added Peach
+        self.peach = Peach((300, 400))
 
         for _ in range(0):
             while True:
                 position = get_random_position(self.screen)
+                # If asteroid hits spaceship or peach, break
                 if (
                     position.distance_to(self.spaceship.position)
+                    > self.MIN_ASTEROID_DISTANCE
+                    or
+                    position.distance_to(self.peach.position)
                     > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
@@ -58,8 +64,19 @@ class SpaceRocks:
             elif is_key_pressed[pygame.K_LEFT]:
                 self.spaceship.rotate(clockwise=False)   
             if is_key_pressed[pygame.K_UP]:
-                self.spaceship.accelerate()        
+                self.spaceship.accelerate()  
 
+        # Copied above for peach, with inputs WASD
+        if self.peach:
+            if is_key_pressed[pygame.K_d]:
+                self.peach.rotate(clockwise=True)
+            elif is_key_pressed[pygame.K_a]:
+                self.peach.rotate(clockwise=False)   
+            if is_key_pressed[pygame.K_w]:
+                self.peach.accelerate()  
+
+              
+    # Didn't touch this for peach
     def _process_game_logic(self):
         for game_object in self._get_game_objects():
 
@@ -67,7 +84,8 @@ class SpaceRocks:
                 game_object.move_no_wrap()
             else:
                 game_object.move(self.screen)
-            if isinstance(game_object, Spaceship): print(game_object.velocity[1])
+            #if isinstance(game_object, Spaceship): print(game_object.velocity[1])
+            if isinstance(game_object, Peach): print(game_object.velocity)
         
         #check if space ship hits asteroid
         if self.spaceship:
@@ -75,6 +93,13 @@ class SpaceRocks:
             for asteroid in self.asteroids:
                 if asteroid.collides_with(self.spaceship):
                     self.spaceship = None
+                    break
+        # Copied above for peach
+        if self.peach:
+            self.peach.accelerate(0)
+            for asteroid in self.asteroids:
+                if asteroid.collides_with(self.peach):
+                    self.peach = None
                     break
 
         for bullet in self.bullets[:]:
@@ -96,5 +121,9 @@ class SpaceRocks:
 
         if self.spaceship:
             game_objects.append(self.spaceship)
+
+        # copied above for peach
+        if self.peach:
+            game_objects.append(self.peach)
         
         return game_objects

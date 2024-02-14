@@ -140,7 +140,7 @@ class Peach(GameObject):
     def __init__(self, position):
         # Initializing spaceship attributes
         self.direction = Vector2(UP)  # Current direction the spaceship is facing
-        super().__init__(position, load_sprite("spaceship"), Vector2(0.5))  # Calling base class constructor
+        super().__init__(position, load_sprite("spaceship"), Vector2(0))  # Calling base class constructor
 
     # Method to rotate the spaceship
     def rotate(self, clockwise=True):
