@@ -1,5 +1,5 @@
 import pygame
-from models import Spaceship, Asteroid, Bullet, Peach
+from models import Spaceship, Asteroid, Bullet, Target, Peach
 from utils import load_sprite, wrap_position, get_random_position
 
 class SpaceRocks:
@@ -19,7 +19,10 @@ class SpaceRocks:
         # Added Peach
         self.peach = Peach((300, 400))
 
-        for _ in range(0):
+        self.capture_agents = [self.spaceship]
+        self.target = Target(get_random_position(self.screen), 10.0)
+
+        for _ in range(1):
             while True:
                 position = get_random_position(self.screen)
                 # If asteroid hits spaceship or peach, break
@@ -84,8 +87,7 @@ class SpaceRocks:
                 game_object.move_no_wrap()
             else:
                 game_object.move(self.screen)
-            #if isinstance(game_object, Spaceship): print(game_object.velocity[1])
-            if isinstance(game_object, Peach): print(game_object.velocity)
+            # if isinstance(game_object, Spaceship): print(game_object.velocity[1])
         
         #check if space ship hits asteroid
         if self.spaceship:
@@ -94,6 +96,11 @@ class SpaceRocks:
                 if asteroid.collides_with(self.spaceship):
                     self.spaceship = None
                     break
+                
+        for capture_agent in self.capture_agents:
+            if capture_agent.collides_with(self.target):
+                self.target.capture()
+
         # Copied above for peach
         if self.peach:
             self.peach.accelerate(0)
@@ -109,6 +116,7 @@ class SpaceRocks:
                     self.bullets.remove(bullet)
                     asteroid.split()
                     break
+        
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
@@ -121,6 +129,8 @@ class SpaceRocks:
 
         if self.spaceship:
             game_objects.append(self.spaceship)
+        if self.target:
+            game_objects.append(self.target)
 
         # copied above for peach
         if self.peach:

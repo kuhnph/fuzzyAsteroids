@@ -1,6 +1,7 @@
 # Importing necessary modules
 from pygame.math import Vector2            # Importing the Vector2 class for 2D vectors
 from pygame.transform import rotozoom      # Importing rotozoom for rotating sprites
+from pygame.font import Font
 from utils import load_sprite, get_random_position, get_random_velocity, wrap_position  # Custom utility functions
 
 # Defining a vector representing upwards direction
@@ -41,6 +42,15 @@ class GameObject:
         distance = self.position.distance_to(other_obj.position)
         # Checking if the distance is less than the sum of the radii for collision
         return distance < self.radius + other_obj.radius
+    
+    # position getter
+    @property
+    def position(self):
+        return self._position
+    # position setter
+    @position.setter
+    def position(self, p):
+        self._position = p
 
 # Subclass representing a spaceship, inheriting from GameObject
 class Spaceship(GameObject):
@@ -166,3 +176,85 @@ class Peach(GameObject):
         # Updating velocity based on direction and acceleration rate
         self.velocity += self.direction * ACCELERATION - self.velocity*self.DAMPENING
 
+
+
+# Subclass representing a spaceship, inheriting from GameObject
+class Peach(GameObject):
+    '''
+    Made Peach half as maneuverable and fast as Spaceship Class.
+    This way, Peach has need for 
+    '''
+    MANEUVERABILITY = 2.5      # Rate of rotation
+    ACCELERATION    = .05     # Acceleration rate
+    DAMPENING       = .01
+
+    def __init__(self, position):
+        # Initializing spaceship attributes
+        self.direction = Vector2(UP)  # Current direction the spaceship is facing
+        super().__init__(position, load_sprite("spaceship"), Vector2(0))  # Calling base class constructor
+
+    # Method to rotate the spaceship
+    def rotate(self, clockwise=True):
+        sign = 1 if clockwise else -1
+        angle = self.MANEUVERABILITY * sign
+        self.direction.rotate_ip(angle)
+
+    # Method to draw the rotated spaceship
+    def draw(self, surface):
+        # Calculating angle between spaceship's direction and upwards direction
+        angle = self.direction.angle_to(UP)
+        # Rotating the sprite according to the angle
+        rotated_surface = rotozoom(self.sprite, angle, 1.0)
+        # Getting size of rotated sprite
+        rotated_surface_size = Vector2(rotated_surface.get_size())
+        # Calculating blit position to center the rotated sprite
+        blit_position = self.position - rotated_surface_size * 0.5
+        # Blitting the rotated sprite onto the surface
+        surface.blit(rotated_surface, blit_position)
+
+    # Method to accelerate the spaceship
+    def accelerate(self, ACCELERATION=ACCELERATION):
+        # Updating velocity based on direction and acceleration rate
+        self.velocity += self.direction * ACCELERATION - self.velocity*self.DAMPENING
+
+
+
+class Target(GameObject):
+    def __init__(self, position, capture_life):
+        self.capture_life = capture_life
+        # initialize target attributes
+        self.sprite = rotozoom(load_sprite('target'),0,0.5)
+        super().__init__(position, self.sprite , Vector2(0))  # Calling base class constructor
+
+    # Method to draw the target
+    def draw(self, surface):
+        # Calculating position for blitting to center the sprite
+        blit_position = self.position - Vector2(self.radius)
+        # draw teh capture life
+        text_to_screen(surface, '{:.1f}'.format(self.capture_life), (blit_position[0], blit_position[1]-20))
+        # Blitting the sprite onto the surface
+        surface.blit(self.sprite, blit_position)
+
+    # capture function
+    def capture(self):
+        self.capture_life -= 0.1
+
+    # damsel getter
+    @property
+    def damsel(self):
+        return self._damsel
+    # damsel setter
+    @damsel.setter
+    def damsel(self, d):
+        self._damsel = d #eez nuts
+    
+def text_to_screen(surface, text, pos, size = 20, color = 'white', font_type = 'assets/fonts/ubuntu.mono.ttf'):
+    try:
+        text = str(text)
+        font = Font(font_type, size)
+        text = font.render(text, True, color)
+        surface.blit(text, pos)
+
+    except Exception as e:
+        print('Font Error in text_to_screen, oopsie poopsie')
+        raise e
