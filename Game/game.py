@@ -1,5 +1,5 @@
 import pygame
-from models import Spaceship, Asteroid, Bullet
+from models import Spaceship, Asteroid, Bullet, Target
 from utils import load_sprite, wrap_position, get_random_position
 
 class SpaceRocks:
@@ -16,6 +16,7 @@ class SpaceRocks:
         self.asteroids = []
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
+        self.target = Target(get_random_position(self.screen))
 
         for _ in range(0):
             while True:
@@ -67,7 +68,7 @@ class SpaceRocks:
                 game_object.move_no_wrap()
             else:
                 game_object.move(self.screen)
-            if isinstance(game_object, Spaceship): print(game_object.velocity[1])
+            # if isinstance(game_object, Spaceship): print(game_object.velocity[1])
         
         #check if space ship hits asteroid
         if self.spaceship:

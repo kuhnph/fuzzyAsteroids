@@ -125,3 +125,19 @@ class Bullet(GameObject):
     def __init__(self, position, velocity):
         # Initializing bullet attributes
         super().__init__(position, load_sprite('bullet'), velocity)
+
+
+class Target(GameObject):
+    def __init__(self, position):
+        # initialize target attributes
+        super().__init__(position, load_sprite("target"), Vector2(0))  # Calling base class constructor
+
+    # position getter
+    @property
+    def position(self):
+        return self._position
+    # position setter
+    @position.setter
+    def position(self, p):
+        self._position = p
+    
