@@ -125,3 +125,44 @@ class Bullet(GameObject):
     def __init__(self, position, velocity):
         # Initializing bullet attributes
         super().__init__(position, load_sprite('bullet'), velocity)
+
+
+# Subclass representing a spaceship, inheriting from GameObject
+class Peach(GameObject):
+    '''
+    Made Peach half as maneuverable and fast as Spaceship Class.
+    This way, Peach has need for 
+    '''
+    MANEUVERABILITY = 2.5      # Rate of rotation
+    ACCELERATION    = .05     # Acceleration rate
+    DAMPENING       = .01
+
+    def __init__(self, position):
+        # Initializing spaceship attributes
+        self.direction = Vector2(UP)  # Current direction the spaceship is facing
+        super().__init__(position, load_sprite("spaceship"), Vector2(0.5))  # Calling base class constructor
+
+    # Method to rotate the spaceship
+    def rotate(self, clockwise=True):
+        sign = 1 if clockwise else -1
+        angle = self.MANEUVERABILITY * sign
+        self.direction.rotate_ip(angle)
+
+    # Method to draw the rotated spaceship
+    def draw(self, surface):
+        # Calculating angle between spaceship's direction and upwards direction
+        angle = self.direction.angle_to(UP)
+        # Rotating the sprite according to the angle
+        rotated_surface = rotozoom(self.sprite, angle, 1.0)
+        # Getting size of rotated sprite
+        rotated_surface_size = Vector2(rotated_surface.get_size())
+        # Calculating blit position to center the rotated sprite
+        blit_position = self.position - rotated_surface_size * 0.5
+        # Blitting the rotated sprite onto the surface
+        surface.blit(rotated_surface, blit_position)
+
+    # Method to accelerate the spaceship
+    def accelerate(self, ACCELERATION=ACCELERATION):
+        # Updating velocity based on direction and acceleration rate
+        self.velocity += self.direction * ACCELERATION - self.velocity*self.DAMPENING
+
