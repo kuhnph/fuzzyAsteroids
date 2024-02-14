@@ -16,7 +16,7 @@ class SpaceRocks:
         self.asteroids = []
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
-        self.target = Target(get_random_position(self.screen))
+        self.target = Target(get_random_position(self.screen), 10.0, self.spaceship)
 
         for _ in range(0):
             while True:
@@ -59,7 +59,7 @@ class SpaceRocks:
             elif is_key_pressed[pygame.K_LEFT]:
                 self.spaceship.rotate(clockwise=False)   
             if is_key_pressed[pygame.K_UP]:
-                self.spaceship.accelerate()        
+                self.spaceship.accelerate()
 
     def _process_game_logic(self):
         for game_object in self._get_game_objects():
@@ -77,6 +77,8 @@ class SpaceRocks:
                 if asteroid.collides_with(self.spaceship):
                     self.spaceship = None
                     break
+            if self.spaceship.collides_with(self.target):
+                self.target.capture()
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
@@ -85,6 +87,7 @@ class SpaceRocks:
                     self.bullets.remove(bullet)
                     asteroid.split()
                     break
+        
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
@@ -97,5 +100,7 @@ class SpaceRocks:
 
         if self.spaceship:
             game_objects.append(self.spaceship)
+        if self.target:
+            game_objects.append(self.target)
         
         return game_objects

@@ -1,6 +1,7 @@
 # Importing necessary modules
 from pygame.math import Vector2            # Importing the Vector2 class for 2D vectors
 from pygame.transform import rotozoom      # Importing rotozoom for rotating sprites
+from pygame.font import Font
 from utils import load_sprite, get_random_position, get_random_velocity, wrap_position  # Custom utility functions
 
 # Defining a vector representing upwards direction
@@ -38,9 +39,20 @@ class GameObject:
     # Method to check collision with another object
     def collides_with(self, other_obj):
         # Calculating distance between this object and another object
-        distance = self.position.distance_to(other_obj.position)
+        adj_pos_self = Vector2((self.position[0]+self.radius, self.position[1]+self.radius))
+        adj_pos_other_obj = Vector2((other_obj.position[0]+other_obj.radius, other_obj.position[1]+other_obj.radius))
+        distance = adj_pos_self.distance_to(adj_pos_other_obj)
         # Checking if the distance is less than the sum of the radii for collision
         return distance < self.radius + other_obj.radius
+    
+    # position getter
+    @property
+    def position(self):
+        return self._position
+    # position setter
+    @position.setter
+    def position(self, p):
+        self._position = p
 
 # Subclass representing a spaceship, inheriting from GameObject
 class Spaceship(GameObject):
@@ -128,16 +140,39 @@ class Bullet(GameObject):
 
 
 class Target(GameObject):
-    def __init__(self, position):
+    def __init__(self, position, capture_life, damsel):
+        self.capture_life = capture_life
+        self.damsel = damsel
         # initialize target attributes
         super().__init__(position, load_sprite("target"), Vector2(0))  # Calling base class constructor
 
-    # position getter
+    # Method to draw the target
+    def draw(self, surface):
+        # draw teh capture life
+        text_to_screen(surface, '{:.1f}'.format(self.capture_life), (self.position[0], self.position[1]-50))
+        # Blitting the sprite onto the surface
+        surface.blit(load_sprite("target"), self._position)
+
+    # capture function
+    def capture(self):
+        self.capture_life -= 0.1
+
+    # damsel getter
     @property
-    def position(self):
-        return self._position
-    # position setter
-    @position.setter
-    def position(self, p):
-        self._position = p
+    def damsel(self):
+        return self._damsel
+    # damsel setter
+    @damsel.setter
+    def damsel(self, d):
+        self._damsel = d #eez nuts
     
+def text_to_screen(surface, text, pos, size = 50, color = 'white', font_type = 'assets/fonts/ubuntu.mono.ttf'):
+    try:
+        text = str(text)
+        font = Font(font_type, size)
+        text = font.render(text, True, color)
+        surface.blit(text, pos)
+
+    except Exception as e:
+        print('Font Error in text_to_screen, oopsie poopsie')
+        raise e
