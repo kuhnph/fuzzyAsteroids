@@ -6,6 +6,7 @@ from utils import load_sprite, get_random_position, get_random_velocity, wrap_po
 
 # Defining a vector representing upwards direction
 UP = Vector2(0, -1)
+RIGHT = Vector2(0, 0)
 
 # Base class representing a generic game object
 class GameObject:
@@ -102,7 +103,7 @@ class Spaceship(GameObject):
 
 # Subclass representing an asteroid, inheriting from GameObject
 class Asteroid(GameObject):
-    def __init__(self, position, create_asteroid_callback, size=3):
+    def __init__(self, position, create_asteroid_callback, size=3, moving=True):
         self.create_asteroid_callback = create_asteroid_callback
         self.size = size    #initialize the size of the asteroids
 
@@ -115,10 +116,11 @@ class Asteroid(GameObject):
         scale = size_to_scale[size] #initialize asteroid scale
         sprite = rotozoom(load_sprite('asteroid'),0,scale) #uses the rotozoom class to scale the sprite
 
-
+        if moving: vel = get_random_velocity(1, 3)
+        else: vel = Vector2(0)
         # Initializing asteroid attributes
         super().__init__(
-            position, sprite, get_random_velocity(1, 3)
+            position, sprite, vel # get_random_velocity(1, 3) TODO
         )
 
     #method for splitting asteroids

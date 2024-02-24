@@ -1,11 +1,12 @@
 import pygame
 from models import Spaceship, Asteroid, Bullet, Target
 from utils import load_sprite, wrap_position, get_random_position
+from pygame.math import Vector2            # Importing the Vector2 class for 2D vectors
 
 class SpaceRocks:
-    MIN_ASTEROID_DISTANCE = 250
-    SCREEN_WIDTH = 1920
-    SCREEN_HEIGHT = 1080
+    MIN_ASTEROID_DISTANCE = 0 # TODO
+    SCREEN_WIDTH = 1000
+    SCREEN_HEIGHT = 600
     def __init__(self):
         self._init_pygame()
         # self.screen = pygame.display.set_mode((800, 600))
@@ -15,21 +16,23 @@ class SpaceRocks:
 
         self.asteroids = []
         self.bullets = []
-        self.spaceship = Spaceship((400, 300), self.bullets.append)
+        self.spaceship = Spaceship((200, self.SCREEN_HEIGHT/2), self.bullets.append)
 
         self.capture_agents = [self.spaceship]
-        self.target = Target(get_random_position(self.screen), 10.0)
+        self.target = Target(Vector2(800, self.SCREEN_HEIGHT/2), 10.0)  # (get_random_position(self.screen), 10.0)
 
-        for _ in range(1):
+        cur_y_pos = 200
+        for _ in range(3):
             while True:
-                position = get_random_position(self.screen)
+                position = Vector2(600, cur_y_pos) # get_random_position(self.screen) TODO
+                cur_y_pos += 100
                 if (
                     position.distance_to(self.spaceship.position)
                     > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
 
-            self.asteroids.append(Asteroid(position, self.asteroids.append))
+            self.asteroids.append(Asteroid(position, self.asteroids.append, moving=False))
 
     def main_loop(self):
         while True:
