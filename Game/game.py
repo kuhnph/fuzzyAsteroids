@@ -4,7 +4,7 @@ from utils import load_sprite, wrap_position, get_random_position
 from pygame.math import Vector2            # Importing the Vector2 class for 2D vectors
 
 class SpaceRocks:
-    MIN_ASTEROID_DISTANCE = 0 # TODO
+    MIN_ASTEROID_DISTANCE = 150
     SCREEN_WIDTH = 1000
     SCREEN_HEIGHT = 600
     def __init__(self):
@@ -19,20 +19,18 @@ class SpaceRocks:
         self.spaceship = Spaceship((200, self.SCREEN_HEIGHT/2), self.bullets.append)
 
         self.capture_agents = [self.spaceship]
-        self.target = Target(Vector2(800, self.SCREEN_HEIGHT/2), 10.0)  # (get_random_position(self.screen), 10.0)
+        self.target = (get_random_position(self.screen), 10.0)
 
-        cur_y_pos = 200
         for _ in range(3):
             while True:
-                position = Vector2(600, cur_y_pos) # get_random_position(self.screen) TODO
-                cur_y_pos += 100
+                position = get_random_position(self.screen)
                 if (
                     position.distance_to(self.spaceship.position)
                     > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
 
-            self.asteroids.append(Asteroid(position, self.asteroids.append, moving=False))
+            self.asteroids.append(Asteroid(position, self.asteroids.append, moving=True))
 
     def main_loop(self):
         while True:
