@@ -37,46 +37,45 @@ class SpaceRocks:
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
 
-    def main_loop(self):
-        while True:
-            self._handle_input()
-            self._process_game_logic()
-            self._draw()
+    def play_step(self):
+        self._handle_input()
+        self._process_game_logic()
+        self._draw()
 
     def _init_pygame(self):
         pygame.init()
         pygame.display.set_caption("Space Rocks")
 
-    def _handle_input(self):
+    def _handle_input(self, ship_input, peach_input):
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (
                 event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
             ):
                 quit()
+
+            #Take space ship input for shooting
             elif (
                 self.spaceship
-                and event.type == pygame.KEYDOWN
-                and event.key == pygame.K_SPACE
+                and ship_input == "shooting"
             ):
                 self.spaceship.shoot()
-        is_key_pressed = pygame.key.get_pressed()
 
         if self.spaceship:
-            if is_key_pressed[pygame.K_RIGHT]:
+            if ship_input == "clockWise":
                 self.spaceship.rotate(clockwise=True)
-            elif is_key_pressed[pygame.K_LEFT]:
+            elif ship_input == "counterWise":
                 self.spaceship.rotate(clockwise=False)   
-            if is_key_pressed[pygame.K_UP]:
+            if ship_input == "accelerate":
                 self.spaceship.accelerate()  
 
         # Copied above for peach, with inputs WASD
         if self.peach:
-            if is_key_pressed[pygame.K_d]:
+            if peach_input == "clockWise":
                 self.peach.rotate(clockwise=True)
-            elif is_key_pressed[pygame.K_a]:
+            elif peach_input == "counterWise":
                 self.peach.rotate(clockwise=False)   
-            if is_key_pressed[pygame.K_w]:
-                self.peach.accelerate()  
+            if peach_input == "accelerate":
+                self.peach.accelerate()
 
               
     # Didn't touch this for peach
