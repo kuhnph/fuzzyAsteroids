@@ -108,6 +108,16 @@ class SpaceRocks:
                 if asteroid.collides_with(self.peach):
                     self.peach = None
                     break
+            for bullet in self.bullets:
+                if bullet.collides_with(self.peach):
+                    self.peach = None
+                    break
+            
+            if self.spaceship.collides_with(self.peach):
+                self.peach = None
+                self.spaceship = None
+                
+                
 
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
