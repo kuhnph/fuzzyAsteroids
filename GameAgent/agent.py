@@ -21,7 +21,7 @@ class Agent:
         pass
 
     def get_action(self):
-        pass    
+        return "shooting", "accelerate"    
 
 def train():
     plot_scores = []
@@ -35,10 +35,10 @@ def train():
         # state_old = agent.get_state(game)
 
         #get move
-        final_move = agent.get_action('test')
+        ship_final_move, peach_final_move = agent.get_action()
 
         #perform move and get new state
-        reward, done, score = game.play_step(final_move)
+        reward, done, score = game.play_step(ship_final_move, peach_final_move)
         # state_new = agent.get_state(game)
 
 if __name__ == '__main__':
