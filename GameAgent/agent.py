@@ -21,7 +21,7 @@ class Agent:
         pass
 
     def get_action(self):
-        return "shooting", "accelerate"    
+        return ["shooting",'clockWise','accelerate'], ["accelerate",'counterClockwise']    
 
 def train():
     plot_scores = []
@@ -29,7 +29,7 @@ def train():
     total_score = 0
     record = 0
     agent = Agent()
-    game = SpaceRocks()
+    game = SpaceRocks(user_input=False)
     while True:
         #get old state
         # state_old = agent.get_state(game)
@@ -38,7 +38,8 @@ def train():
         ship_final_move, peach_final_move = agent.get_action()
 
         #perform move and get new state
-        reward, done, score = game.play_step(ship_final_move, peach_final_move)
+        # reward, done, score = game.play_step(ship_final_move, peach_final_move)
+        game.play_step(ship_final_move, peach_final_move)
         # state_new = agent.get_state(game)
 
 if __name__ == '__main__':

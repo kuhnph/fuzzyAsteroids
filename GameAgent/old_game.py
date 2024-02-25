@@ -12,7 +12,6 @@ class SpaceRocks:
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.background = load_sprite("space", False)
         self.clock = pygame.time.Clock()
-        self.user_input = user_input
 
         self.asteroids = []
         self.bullets = []
@@ -38,12 +37,8 @@ class SpaceRocks:
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
 
-    #play step is now handled in the train loop
-    def play_step(self, ship_final_move='NA', peach_final_move='NA'):
-        if  self.user_input:
-            self._handle_user_input()
-        else:
-            self._handle_input(ship_final_move, peach_final_move)
+    def play_step(self, ship_final_move, peach_final_move):
+        self._handle_input(ship_final_move, peach_final_move)
         self._process_game_logic()
         self._draw()
 
@@ -81,42 +76,12 @@ class SpaceRocks:
             if "accelerate" in peach_input:
                 self.peach.accelerate()
 
-    def _handle_user_input(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (
-                event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
-            ):
-                quit()
-            elif (
-                self.spaceship
-                and event.type == pygame.KEYDOWN
-                and event.key == pygame.K_SPACE
-            ):
-                self.spaceship.shoot()
-        is_key_pressed = pygame.key.get_pressed()
-
-        if self.spaceship:
-            if is_key_pressed[pygame.K_RIGHT]:
-                self.spaceship.rotate(clockwise=True)
-            elif is_key_pressed[pygame.K_LEFT]:
-                self.spaceship.rotate(clockwise=False)   
-            if is_key_pressed[pygame.K_UP]:
-                self.spaceship.accelerate()  
-
-        # Copied above for peach, with inputs WASD
-        if self.peach:
-            if is_key_pressed[pygame.K_d]:
-                self.peach.rotate(clockwise=True)
-            elif is_key_pressed[pygame.K_a]:
-                self.peach.rotate(clockwise=False)   
-            if is_key_pressed[pygame.K_w]:
-                self.peach.accelerate()  
-
               
-    #Loop for game logic. Mainly deals with colisions
+    #Logic for game loop
     def _process_game_logic(self):
         for game_object in self._get_game_objects():
 
+            #Move bullet
             if isinstance(game_object, Bullet):
                 game_object.move_no_wrap()
             else:
@@ -130,32 +95,19 @@ class SpaceRocks:
                 if asteroid.collides_with(self.spaceship):
                     self.spaceship = None
                     break
-        
-        #Check if ship is in target
+                
         for capture_agent in self.capture_agents:
             if capture_agent.collides_with(self.target):
                 self.target.capture()
 
-        #Check if peach collides with asteroid
+        # Copied above for peach
         if self.peach:
             self.peach.accelerate(0)
             for asteroid in self.asteroids:
                 if asteroid.collides_with(self.peach):
                     self.peach = None
                     break
-            for bullet in self.bullets:
-                if bullet.collides_with(self.peach):
-                    self.peach = None
-                    break
 
-        #check if spaceship and peach exist. Check if ship collides with Peach       
-        if self.peach and self.spaceship:    
-            if self.spaceship.collides_with(self.peach):
-                self.peach = None
-                self.spaceship = None
-                
-                
-        #check if bullet colides with asteroid
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
                 if asteroid.collides_with(bullet):
