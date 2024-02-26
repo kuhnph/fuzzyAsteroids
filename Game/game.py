@@ -6,12 +6,13 @@ class SpaceRocks:
     MIN_ASTEROID_DISTANCE = 250
     SCREEN_WIDTH = 1920
     SCREEN_HEIGHT = 1080
-    def __init__(self):
+    def __init__(self, user_input=True):
         self._init_pygame()
         # self.screen = pygame.display.set_mode((800, 600))
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.background = load_sprite("space", False)
         self.clock = pygame.time.Clock()
+        self.user_input = user_input
 
         self.asteroids = []
         self.bullets = []
@@ -37,17 +38,50 @@ class SpaceRocks:
 
             self.asteroids.append(Asteroid(position, self.asteroids.append))
 
-    def main_loop(self):
-        while True:
-            self._handle_input()
-            self._process_game_logic()
-            self._draw()
+    #play step is now handled in the train loop
+    def play_step(self, ship_final_move='NA', peach_final_move='NA'):
+        if  self.user_input:
+            self._handle_user_input()
+        else:
+            self._handle_input(ship_final_move, peach_final_move)
+        self._process_game_logic()
+        self._draw()
 
     def _init_pygame(self):
         pygame.init()
         pygame.display.set_caption("Space Rocks")
 
-    def _handle_input(self):
+    def _handle_input(self, ship_input, peach_input):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (
+                event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
+            ):
+                quit()
+
+        #Ship input handling
+        if self.spaceship:
+            if "clockWise" in ship_input:
+                self.spaceship.rotate(clockwise=True)
+            elif "counterWise" in ship_input:
+                self.spaceship.rotate(clockwise=False)   
+            if "accelerate" in ship_input:
+                self.spaceship.accelerate()
+            if (
+                "shooting" in ship_input
+                #TODO add  shooting delay to the game logic
+                ):
+                self.spaceship.shoot()
+
+        #Peach input handling
+        if self.peach:
+            if "clockWise" in peach_input:
+                self.peach.rotate(clockwise=True)
+            elif "counterWise" in peach_input:
+                self.peach.rotate(clockwise=False)   
+            if "accelerate" in peach_input:
+                self.peach.accelerate()
+
+    def _handle_user_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (
                 event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
@@ -79,7 +113,7 @@ class SpaceRocks:
                 self.peach.accelerate()  
 
               
-    # Didn't touch this for peach
+    #Loop for game logic. Mainly deals with colisions
     def _process_game_logic(self):
         for game_object in self._get_game_objects():
 
@@ -96,19 +130,32 @@ class SpaceRocks:
                 if asteroid.collides_with(self.spaceship):
                     self.spaceship = None
                     break
-                
+        
+        #Check if ship is in target
         for capture_agent in self.capture_agents:
             if capture_agent.collides_with(self.target):
                 self.target.capture()
 
-        # Copied above for peach
+        #Check if peach collides with asteroid
         if self.peach:
             self.peach.accelerate(0)
             for asteroid in self.asteroids:
                 if asteroid.collides_with(self.peach):
                     self.peach = None
                     break
+            for bullet in self.bullets:
+                if bullet.collides_with(self.peach):
+                    self.peach = None
+                    break
 
+        #check if spaceship and peach exist. Check if ship collides with Peach       
+        if self.peach and self.spaceship:    
+            if self.spaceship.collides_with(self.peach):
+                self.peach = None
+                self.spaceship = None
+                
+                
+        #check if bullet colides with asteroid
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
                 if asteroid.collides_with(bullet):
