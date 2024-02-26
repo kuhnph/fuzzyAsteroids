@@ -1,6 +1,7 @@
 import pygame
 from models import Spaceship, Asteroid, Bullet, Target, Peach
 from utils import load_sprite, wrap_position, get_random_position
+from pygame.math import Vector2
 
 class SpaceRocks:
     MIN_ASTEROID_DISTANCE = 250
