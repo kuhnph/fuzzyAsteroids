@@ -1,12 +1,11 @@
 import pygame
 from models import Spaceship, Asteroid, Bullet, Target, Peach
 from utils import load_sprite, wrap_position, get_random_position
-from pygame.math import Vector2            # Importing the Vector2 class for 2D vectors
 
 class SpaceRocks:
-    MIN_ASTEROID_DISTANCE = 0 # TODO
-    SCREEN_WIDTH = 1000
-    SCREEN_HEIGHT = 600
+    MIN_ASTEROID_DISTANCE = 250
+    SCREEN_WIDTH = 1920
+    SCREEN_HEIGHT = 1080
     def __init__(self, user_input=True):
         self._init_pygame()
         # self.screen = pygame.display.set_mode((800, 600))
@@ -17,24 +16,27 @@ class SpaceRocks:
 
         self.asteroids = []
         self.bullets = []
-        self.spaceship = Spaceship((200, self.SCREEN_HEIGHT/2), self.bullets.append)
+        self.spaceship = Spaceship((400, 300), self.bullets.append)
         # Added Peach
         self.peach = Peach((300, 400))
-        self.capture_agents = [self.peach]
-        self.target = Target(Vector2(800, self.SCREEN_HEIGHT/2), 10.0)  # (get_random_position(self.screen), 10.0)
 
-        cur_y_pos = 200
-        for _ in range(3):
+        self.capture_agents = [self.peach]
+        self.target = Target(get_random_position(self.screen), 10.0)
+
+        for _ in range(1):
             while True:
-                position = Vector2(600, cur_y_pos) # get_random_position(self.screen) TODO
-                cur_y_pos += 100
+                position = get_random_position(self.screen)
+                # If asteroid hits spaceship or peach, break
                 if (
                     position.distance_to(self.spaceship.position)
+                    > self.MIN_ASTEROID_DISTANCE
+                    or
+                    position.distance_to(self.peach.position)
                     > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
 
-            self.asteroids.append(Asteroid(position, self.asteroids.append, moving=False))
+            self.asteroids.append(Asteroid(position, self.asteroids.append))
 
     #play step is now handled in the train loop
     def play_step(self, ship_final_move='NA', peach_final_move='NA'):

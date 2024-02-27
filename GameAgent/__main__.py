@@ -1,4 +1,4 @@
-from game_scene_01    import SpaceRocks
+from game import SpaceRocks
 
 if __name__ == "__main__":    
     space_rocks = SpaceRocks(user_input=True)
