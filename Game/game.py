@@ -15,6 +15,9 @@ class SpaceRocks:
         self.clock = pygame.time.Clock()
         self.user_input = user_input
 
+        #init frame count
+        self.frame = 0
+
         self.asteroids = []
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
@@ -24,7 +27,7 @@ class SpaceRocks:
         self.capture_agents = [self.peach]
         self.target = Target(get_random_position(self.screen), 10.0)
 
-        for _ in range(1):
+        for _ in range(0):
             while True:
                 position = get_random_position(self.screen)
                 # If asteroid hits spaceship or peach, break
@@ -47,6 +50,7 @@ class SpaceRocks:
             self._handle_input(ship_final_move, peach_final_move)
         self._process_game_logic()
         self._draw()
+        self.frame += 1
 
     def _init_pygame(self):
         pygame.init()
@@ -126,9 +130,9 @@ class SpaceRocks:
         
         #check if space ship hits asteroid
         if self.spaceship:
-            self.spaceship.accelerate(0)
             for asteroid in self.asteroids:
                 if asteroid.collides_with(self.spaceship):
+                    self.spaceship.accelerate(0)
                     self.spaceship = None
                     break
         
@@ -139,9 +143,9 @@ class SpaceRocks:
 
         #Check if peach collides with asteroid
         if self.peach:
-            self.peach.accelerate(0)
             for asteroid in self.asteroids:
                 if asteroid.collides_with(self.peach):
+                    self.peach.accelerate()
                     self.peach = None
                     break
             for bullet in self.bullets:
