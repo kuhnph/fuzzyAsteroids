@@ -1,6 +1,6 @@
 from .features import extract_features
 
-def compute_episode_cost(game, overshoot_error, average_velocity):
+def compute_episode_cost(game, overshoot_error, average_velocity, progress_fraction):
     """
     Compute the episode cost using the later agent_final.py behavior.
     """
@@ -12,20 +12,19 @@ def compute_episode_cost(game, overshoot_error, average_velocity):
     SCREEN_DIAG = int((SCREEN_WIDTH**2+SCREEN_HEIGHT**2)**.5)
     overshoot_cost = overshoot_error / SCREEN_DIAG
     undershoot_cost = X['relative_states'][0] / SCREEN_DIAG
-
-    if average_velocity < .1:
-        no_speed_cost = 1
-    else:
-        no_speed_cost = 0
+    
+    
 
     time_cost = game.ticks / game.max_train_ticks
-
-    cost = overshoot_cost*12 + no_speed_cost*.2 + undershoot_cost*.2 + time_cost*.4
+    cost = overshoot_cost + time_cost - progress_fraction + undershoot_cost
 
     reached_capture_phase = game.current_life < game.START_CAPTURE_LIFE
     if not reached_capture_phase:
-        cost = cost + 1
+        cost = cost + 1e6
     
-    print(f'overshoot cost: {overshoot_cost} | speed cost: {no_speed_cost} | Undershoot cost: {undershoot_cost} | time cost:{time_cost}')
-    print(f'total cost: {cost}\n')
+    # if average_velocity < .1:
+    #     cost += 1e9
+    
+    # print(f'overshoot cost: {overshoot_cost}| time cost: {time_cost} | progress fraction:{progress_fraction} | undershoot cost:{undershoot_cost}')
+    # print(f'total cost: {cost}\n')
     return cost

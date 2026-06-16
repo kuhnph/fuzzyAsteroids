@@ -3,6 +3,7 @@ from .chromosome import (
     decode_input_membership,
     decode_output_membership,
     decode_rules,
+    decode_chromosome,
 )
 from .inference import scaled_output_centroid
 
@@ -25,28 +26,19 @@ class FuzzyController:
     SPEED_MIN = -0.01
     SPEED_MAX = 2.5
 
-    def __init__(self):
+    def __init__(self, chromosome_config):
+        self.chromosome_config = chromosome_config
         self.debugCount = 0
         pass
 
     def evaluate(self, chromosome, heading_error, position_error, speed):
         """
-        Run the fuzzy inference system and return ship and Peach actions.
-
-        Chromosome layout
-        -----------------
-        0:8    -> position-error input memberships
-        9:17   -> speed input memberships
-        18:43  -> 5x5 rule table for speed output
-        44:52  -> speed output memberships
-
-        Notes
-        -----
-        Gene index 8 and gene index 17 are currently unused in the original
-        implementation. I preserved that behavior because it matches your code.
+        Chromosome be changing
         """
-        if len(chromosome) != 52:
-            raise ValueError("Controller expects a chromosome of length 52")
+        # if len(chromosome) != 52:
+        #     raise ValueError("Controller expects a chromosome of length 52")
+
+        position_genes, speed_genes, rule_genes, output_genes = decode_chromosome(chromosome, self.chromosome_config)
 
         # Input 1: heading error
         # Original code used a 2-set shoulder split at zero.
@@ -56,19 +48,19 @@ class FuzzyController:
         # Input 2: position error
         position_memberships = decode_input_membership(
             position_error,
-            chromosome=chromosome[0:8],
+            chromosome=position_genes,
             map_min=self.POSITION_ERROR_MIN,
             map_max=self.POSITION_ERROR_MAX,
-            n_sets=5,
+            n_sets=self.chromosome_config.n_position_sets,
         )
 
         # Input 3: speed
         speed_memberships = decode_input_membership(
             speed,
-            chromosome=chromosome[9:17],
+            chromosome=speed_genes,
             map_min=self.SPEED_MIN,
             map_max=self.SPEED_MAX,
-            n_sets=5,
+            n_sets=self.chromosome_config.n_speed_sets,
         )
 
         # Output 1: turn direction
@@ -88,22 +80,17 @@ class FuzzyController:
         speed_rule_memberships = decode_rules(
             position_memberships,
             speed_memberships,
-            chromosome=chromosome[18:43],
-            n_rules=5,
+            chromosome= rule_genes,
+            n_sets=self.chromosome_config.n_output_sets,
         )
 
         speed_output_sets = decode_output_membership(
-            chromosome=chromosome[44:52],
+            chromosome=output_genes,
             map_min=0,
             map_max=2.5,
-            n_sets=5,
+            n_sets=self.chromosome_config.n_output_sets,
         )
 
-        # if self.debugCount % 5 ==0:
-        #     print(f"controller.py:\n\
-        #         heading error: {heading_error}\n\
-        #         negative heading membership: {heading_negative}\n\
-        #         positive heading membership: {heading_positive}")
 
         # Defuzzify outputs
         turn_value = scaled_output_centroid(

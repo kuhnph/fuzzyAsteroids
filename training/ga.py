@@ -4,7 +4,7 @@ import numpy as np
 from deap import algorithms, base, creator, tools
 
 
-def build_toolbox(agent, chromosome_length=52, int_min=0, int_max=4):
+def build_toolbox(agent, chromosome_length, int_min=0, int_max=4):
     """
     Create and return a DEAP toolbox configured for this project.
     """

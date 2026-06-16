@@ -11,13 +11,13 @@ class SpaceRocks:
     MIN_ASTEROID_DISTANCE = 250
     SCREEN_WIDTH = int(1920/1.5)
     SCREEN_HEIGHT = int(1080/1.5)
-    max_train_ticks = 1000
+    max_train_ticks = 2000
     START_CAPTURE_LIFE = 10
     margin = 20
     PEACH_POSITION = (random.uniform(margin, SCREEN_WIDTH - margin), random.uniform(margin, SCREEN_HEIGHT - margin))
     TARGET_POSITION = (random.uniform(margin, SCREEN_WIDTH - margin), random.uniform(margin, SCREEN_HEIGHT - margin))
 
-    def __init__(self, user_input=True, enable_player=False):
+    def __init__(self, user_input=True, enable_player=False, render=True, fps=1000):
         """
         Parameters
         ----------
@@ -28,8 +28,11 @@ class SpaceRocks:
             If True, spawn the player spaceship.
             If False, only Peach exists.
         """
+        #Game stuffs
         self.user_input = user_input
         self.enable_player = enable_player
+        self.render = render
+        self.fps = fps
 
         self._init_pygame()
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
@@ -86,10 +89,13 @@ class SpaceRocks:
         """
         Soft reset for training.
         """
-        self.peach = Peach(self.random_position_away())
+        peach_initial_position = self.random_position_away()
+        target_initial_position = self.random_position_away()
+        self.initial_position_error = target_initial_position.distance_to(peach_initial_position)
+
+        self.peach = Peach(peach_initial_position)
         self.capture_agents = [self.peach]
-        self.target = Target(self.random_position_away(), self.START_CAPTURE_LIFE)
-        # self.initial_error = self.peach.distance_to(self.Target)
+        self.target = Target(target_initial_position, self.START_CAPTURE_LIFE)
 
         self.asteroids = []
         self.bullets = []
@@ -114,7 +120,10 @@ class SpaceRocks:
             apply_agent_actions(self, ship_actions, peach_actions)
 
         self._process_game_logic()
-        self._draw()
+
+        #only render if I wanna
+        if self.render:
+            self._draw()
 
     def move_target_if_captured(self):
         """
@@ -184,11 +193,12 @@ class SpaceRocks:
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
+
         for game_object in self._get_game_objects():
             game_object.draw(self.screen)
 
         pygame.display.flip()
-        self.clock.tick(1000)
+        self.clock.tick(self.fps)
 
     def _get_game_objects(self):
         game_objects = [*self.asteroids, *self.bullets]
@@ -220,7 +230,7 @@ class SpaceRocks:
     #                 return candidate
         
     #     return self.random_position()    #return candidate anyway know we gave it the ole college try
-    def random_position_away(self, margin=80, min_distance=100, max_attempts=100):
+    def random_position_away(self, margin=80, min_distance=200, max_attempts=100):
         object_positions = [
             obj.position for obj in self._get_game_objects()
             if obj is not None
@@ -231,5 +241,5 @@ class SpaceRocks:
 
             if all(candidate.distance_to(pos) >= min_distance for pos in object_positions):
                 return candidate
-
+        print("AHHHHHHHHHH")
         return self.random_position(margin=margin)

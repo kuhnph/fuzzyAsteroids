@@ -3,6 +3,7 @@ from collections import deque
 
 from game import SpaceRocks
 from fuzzy import FuzzyController
+from fuzzy.chromosome import chromosomeConfig
 
 from .features import extract_features
 from .cost import compute_episode_cost
@@ -18,25 +19,35 @@ MAX_MEMORY = 100_000
 
 
 class TrainingAgent:
-    def __init__(self):
-        self.n_games = 0
+    def __init__(self, render=False):
+        self.game_samples = 30
         self.memory = deque(maxlen=MAX_MEMORY)
 
         # GA state
         self.ga_initialized = False
         self.generation = 0
 
-        self.INT_MIN = 0
-        self.INT_MAX = 4
+
         self.TOURNSIZE = 7
         self.POPULATION_SIZE = 6
         self.CXPB = 0.6
         self.MUTPB = 0.2
-        self.N = 52
+
+        self.chromosome_config = chromosomeConfig(
+            n_position_sets=20,
+            n_speed_sets=20,
+            n_output_sets=20,
+            gene_min=0,
+            gene_max=19
+        )
+        self.N = self.chromosome_config.length
+        self.INT_MIN = self.chromosome_config.gene_min
+        self.INT_MAX = self.chromosome_config.gene_max
 
         # Environment + controller
-        self.game = SpaceRocks(user_input=False, enable_player=False)
-        self.controller = FuzzyController()
+        #TODO make separate agents
+        self.game = SpaceRocks(user_input=False, enable_player=False, render=render)
+        self.controller = FuzzyController(self.chromosome_config)
 
         # Episode bookkeeping
         self.overshoot_error = 0.0
@@ -108,23 +119,24 @@ class TrainingAgent:
         if self.game.current_life < self.game.START_CAPTURE_LIFE:
             self.overshoot_error = max(self.overshoot_error, position_error)
 
-    def evaluate_chromosome(self, chromosome):
+    def evaluate_one_episode(self, chromosome):
         """
         Evaluate one chromosome over a single episode.
 
-        Returns a DEAP-compatible tuple: (cost,)
+        Returns
+        -------
+        float
+            Episode cost.
         """
-        self.pop_evals += 1
         self.game.reset_episode()
         self.reset_episode_tracking()
 
         velocity_sum = 0.0
         velocity_count = 0
-        heading_sum = 0
+        heading_sum = 0.0
 
         while True:
             if self.game.peach is None:
-                # Peach died. End the episode harshly.
                 break
 
             self.refresh_features()
@@ -135,6 +147,7 @@ class TrainingAgent:
 
             speed_sample = (self.states[2]**2 + self.states[3]**2) ** 0.5
             heading_sample = self.relative_states[1]
+
             heading_sum += heading_sample
             velocity_sum += speed_sample
             velocity_count += 1
@@ -151,19 +164,43 @@ class TrainingAgent:
         else:
             final_position_error = 1e6
 
-        reached_capture_phase = self.game.current_life < self.game.START_CAPTURE_LIFE
-
         average_velocity = velocity_sum / velocity_count if velocity_count > 0 else 0.0
 
-        average_heading = heading_sum/velocity_count if velocity_count > 0 else 0.0
+        if velocity_count > 0 and self.game.initial_position_error > 0:
+            progress_fraction = (
+                self.game.initial_position_error - final_position_error
+            ) / self.game.initial_position_error
+        else:
+            progress_fraction = 0.0
 
-        cost = compute_episode_cost(self.game,
+        cost = compute_episode_cost(
+            self.game,
             overshoot_error=self.overshoot_error,
             average_velocity=average_velocity,
+            progress_fraction=progress_fraction,
         )
 
+        print(cost)
+        return cost
 
-        return (cost,)
+    def evaluate_chromosome(self, chromosome):
+        """
+        Evaluate one chromosome over multiple randomized episodes.
+
+        Returns a DEAP-compatible tuple: (cost,)
+        """
+        self.pop_evals += 1
+
+        total_cost = 0.0
+
+        for _ in range(self.game_samples):
+            episode_cost = self.evaluate_one_episode(chromosome)
+            total_cost += episode_cost
+
+        average_cost = total_cost / self.game_samples
+
+        print(f'average cost: {average_cost}')
+        return (average_cost,)
 
     def train_step(self):
         """
