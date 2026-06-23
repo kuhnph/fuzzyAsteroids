@@ -1,12 +1,12 @@
 from pygame.math import Vector2
 from pygame.transform import rotozoom
 from pygame.font import Font
-import os
 # import sys
 # rootPath = os.path.dirname(os.path.dirname(__file__))
 # sys.path.append(rootPath)
 
 from .assets import load_sprite, get_random_velocity, wrap_position
+from .settings import GameSettings
 
 
 UP = Vector2(0, -1)
@@ -42,10 +42,10 @@ class GameObject:
 
 
 class Spaceship(GameObject):
-    MANEUVERABILITY = 5
-    ACCELERATION = 0.1
-    BULLET_SPEED = 3
-    DAMPENING = 0.01
+    MANEUVERABILITY = GameSettings.SPACESHIP_MANEUVERABILITY
+    ACCELERATION = GameSettings.SPACESHIP_ACCELERATION
+    BULLET_SPEED = GameSettings.SPACESHIP_BULLET_SPEED
+    DAMPENING = GameSettings.SPACESHIP_DAMPENING
 
     def __init__(self, position, create_bullet_callback):
         self.create_bullet_callback = create_bullet_callback
@@ -77,12 +77,12 @@ class Spaceship(GameObject):
 
 class Peach(GameObject):
     """
-    AI-controlled capture agent.
+    capture agent.
     Slightly less maneuverable than the player ship.
     """
-    MANEUVERABILITY = 2.5
-    ACCELERATION = 0.05
-    DAMPENING = 0.01
+    MANEUVERABILITY = GameSettings.PEACH_MANEUVERABILITY
+    ACCELERATION = GameSettings.PEACH_ACCELERATION
+    DAMPENING = GameSettings.PEACH_DAMPENING
 
     def __init__(self, position):
         self.direction = Vector2(RIGHT)
@@ -97,7 +97,7 @@ class Peach(GameObject):
         angle = self.direction.angle_to(UP)
         rotated_surface = rotozoom(self.sprite, angle, 1.0)
         rotated_surface_size = Vector2(rotated_surface.get_size())
-        blit_position = self.position - rotated_surface_size * 0.5
+        blit_position = self.position - rotated_surface_size * 0.5  #Calculate upper left corner
         surface.blit(rotated_surface, blit_position)
 
     def accelerate(self, acceleration=None):
@@ -107,24 +107,22 @@ class Peach(GameObject):
 
 
 class Asteroid(GameObject):
-    def __init__(self, position, create_asteroid_callback, size=3):
+    def __init__(self, position, create_asteroid_callback, size=GameSettings.ASTEROID_START_SIZE):
         self.create_asteroid_callback = create_asteroid_callback
         self.size = size
 
-        size_to_scale = {
-            3: 1.0,
-            2: 0.5,
-            1: 0.25,
-        }
-
-        scale = size_to_scale[size]
+        scale = GameSettings.ASTEROID_SIZE_TO_SCALE[size]
         sprite = rotozoom(load_sprite("asteroid"), 0, scale)
 
-        super().__init__(position, sprite, get_random_velocity(1, 3))
+        super().__init__(
+            position,
+            sprite,
+            get_random_velocity(GameSettings.ASTEROID_MIN_SPEED, GameSettings.ASTEROID_MAX_SPEED),
+        )
 
     def split(self):
         if self.size > 1:
-            for _ in range(2):
+            for _ in range(GameSettings.ASTEROID_SPLIT_COUNT):
                 asteroid = Asteroid(
                     self.position,
                     self.create_asteroid_callback,
@@ -141,7 +139,7 @@ class Bullet(GameObject):
 class Target(GameObject):
     def __init__(self, position, capture_life):
         self.capture_life = capture_life
-        sprite = rotozoom(load_sprite("target"), 0, 0.5)
+        sprite = rotozoom(load_sprite("target"), 0, GameSettings.TARGET_SCALE)
         super().__init__(position, sprite, Vector2(0, 0))
 
     def draw(self, surface):
@@ -149,21 +147,21 @@ class Target(GameObject):
         text_to_screen(
             surface,
             f"{self.capture_life:.1f}",
-            (blit_position[0], blit_position[1] - 20),
+            (blit_position[0], blit_position[1] - GameSettings.TARGET_LABEL_OFFSET_Y),
         )
         surface.blit(self.sprite, blit_position)
 
     def capture(self):
-        self.capture_life -= 0.1
+        self.capture_life -= GameSettings.CAPTURE_DECREMENT
 
 
 def text_to_screen(
     surface,
     text,
     pos,
-    size=20,
-    color="white",
-    font_type=os.path.join('assets','fonts','ubuntu.mono.ttf'),
+    size=GameSettings.FONT_SIZE,
+    color=GameSettings.FONT_COLOR,
+    font_type=GameSettings.FONT_PATH,
 ):
     """
     Draw text to the pygame surface.

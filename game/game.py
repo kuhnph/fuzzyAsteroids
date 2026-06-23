@@ -5,19 +5,20 @@ from pygame.math import Vector2
 from .entities import Spaceship, Peach, Asteroid, Bullet, Target
 from .assets import load_sprite, get_random_position
 from .input_handlers import handle_manual_input, apply_agent_actions
+from .settings import GameSettings
 
 
 class SpaceRocks:
-    MIN_ASTEROID_DISTANCE = 250
-    SCREEN_WIDTH = int(1920/1.5)
-    SCREEN_HEIGHT = int(1080/1.5)
-    max_train_ticks = 2000
-    START_CAPTURE_LIFE = 10
-    margin = 20
+    MIN_ASTEROID_DISTANCE = GameSettings.MIN_ASTEROID_DISTANCE
+    SCREEN_WIDTH = GameSettings.SCREEN_WIDTH
+    SCREEN_HEIGHT = GameSettings.SCREEN_HEIGHT
+    max_train_ticks = GameSettings.MAX_TICKS
+    START_CAPTURE_LIFE = GameSettings.START_CAPTURE_LIFE
+    margin = GameSettings.POSITION_MARGIN
     PEACH_POSITION = (random.uniform(margin, SCREEN_WIDTH - margin), random.uniform(margin, SCREEN_HEIGHT - margin))
     TARGET_POSITION = (random.uniform(margin, SCREEN_WIDTH - margin), random.uniform(margin, SCREEN_HEIGHT - margin))
 
-    def __init__(self, user_input=True, enable_player=False, render=True, fps=1000):
+    def __init__(self, user_input=True, enable_player=False, render=True, fps=GameSettings.DEFAULT_FPS):
         """
         Parameters
         ----------
@@ -43,7 +44,7 @@ class SpaceRocks:
         self.bullets = []
 
         self.spaceship = (
-            Spaceship((400, 300), self.bullets.append)
+            Spaceship(GameSettings.PLAYER_START_POSITION, self.bullets.append)
             if self.enable_player
             else None
         )
@@ -60,11 +61,11 @@ class SpaceRocks:
 
         # You currently initialize with zero asteroids in the newer file.
         # Keep that behavior for now.
-        self.spawn_initial_asteroids(count=0)
+        self.spawn_initial_asteroids(count=GameSettings.INITIAL_ASTEROID_COUNT)
 
     def _init_pygame(self):
         pygame.init()
-        pygame.display.set_caption("Space Rocks")
+        pygame.display.set_caption(GameSettings.WINDOW_CAPTION)
 
     def spawn_initial_asteroids(self, count=1):
         for _ in range(count):
@@ -101,7 +102,7 @@ class SpaceRocks:
         self.bullets = []
 
         self.spaceship = (
-            Spaceship((400, 300), self.bullets.append)
+            Spaceship(GameSettings.PLAYER_START_POSITION, self.bullets.append)
             if self.enable_player
             else None
         )
@@ -213,8 +214,51 @@ class SpaceRocks:
             game_objects.append(self.peach)
 
         return game_objects
+
+    def get_entity_states(self):
+        """
+        Return a snapshot of every active game entity.
+
+        The snapshot uses plain Python types so it can be logged, serialized,
+        or consumed by controllers without exposing mutable pygame objects.
+        """
+        return {
+            "spaceship": self._serialize_entity(self.spaceship),
+            "peach": self._serialize_entity(self.peach),
+            "target": self._serialize_entity(self.target),
+            "asteroids": [
+                self._serialize_entity(asteroid)
+                for asteroid in self.asteroids
+            ],
+            "bullets": [
+                self._serialize_entity(bullet)
+                for bullet in self.bullets
+            ],
+        }
+
+    def _serialize_entity(self, entity):
+        if entity is None:
+            return None
+
+        state = {
+            "type": entity.__class__.__name__,
+            "position": [entity.position.x, entity.position.y],
+            "velocity": [entity.velocity.x, entity.velocity.y],
+            "radius": entity.radius,
+        }
+
+        if hasattr(entity, "direction"):
+            state["direction"] = [entity.direction.x, entity.direction.y]
+
+        if hasattr(entity, "size"):
+            state["size"] = entity.size
+
+        if hasattr(entity, "capture_life"):
+            state["capture_life"] = entity.capture_life
+
+        return state
     
-    def random_position(self, margin=80):
+    def random_position(self, margin=GameSettings.RANDOM_POSITION_MARGIN):
         x = random.uniform(margin, self.SCREEN_WIDTH-margin)
         y = random.uniform(margin, self.SCREEN_HEIGHT-margin)
 
@@ -230,7 +274,12 @@ class SpaceRocks:
     #                 return candidate
         
     #     return self.random_position()    #return candidate anyway know we gave it the ole college try
-    def random_position_away(self, margin=80, min_distance=200, max_attempts=100):
+    def random_position_away(
+        self,
+        margin=GameSettings.RANDOM_POSITION_MARGIN,
+        min_distance=GameSettings.RANDOM_AWAY_MIN_DISTANCE,
+        max_attempts=GameSettings.RANDOM_AWAY_MAX_ATTEMPTS,
+    ):
         object_positions = [
             obj.position for obj in self._get_game_objects()
             if obj is not None
@@ -241,5 +290,4 @@ class SpaceRocks:
 
             if all(candidate.distance_to(pos) >= min_distance for pos in object_positions):
                 return candidate
-        print("AHHHHHHHHHH")
         return self.random_position(margin=margin)

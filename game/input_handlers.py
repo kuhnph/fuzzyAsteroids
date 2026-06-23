@@ -1,5 +1,10 @@
 import pygame
 
+from .settings import ActionSettings
+
+
+ACTION_CONFIG = ActionSettings()
+
 
 def handle_quit_events():
     """
@@ -54,8 +59,8 @@ def apply_agent_actions(game, ship_actions=None, peach_actions=None):
     Apply AI/controller-generated actions.
 
     Expected format:
-        ["clockWise", "accelerate"]
-        ["counterWise"]
+        [ACTION_CONFIG.clockwise_action, ACTION_CONFIG.accelerate_action]
+        [ACTION_CONFIG.counter_clockwise_action]
         []
     """
     ship_actions = ship_actions or []
@@ -66,22 +71,22 @@ def apply_agent_actions(game, ship_actions=None, peach_actions=None):
         pass
 
     if game.spaceship is not None:
-        if "clockWise" in ship_actions:
+        if ACTION_CONFIG.clockwise_action in ship_actions:
             game.spaceship.rotate(clockwise=True)
-        elif "counterWise" in ship_actions:
+        elif ACTION_CONFIG.counter_clockwise_action in ship_actions:
             game.spaceship.rotate(clockwise=False)
 
-        if "accelerate" in ship_actions:
+        if ACTION_CONFIG.accelerate_action in ship_actions:
             game.spaceship.accelerate()
 
-        if "shooting" in ship_actions:
+        if ACTION_CONFIG.shoot_action in ship_actions:
             game.spaceship.shoot()
 
     if game.peach is not None:
-        if "clockWise" in peach_actions:
+        if ACTION_CONFIG.clockwise_action in peach_actions:
             game.peach.rotate(clockwise=True)
-        elif "counterWise" in peach_actions:
+        elif ACTION_CONFIG.counter_clockwise_action in peach_actions:
             game.peach.rotate(clockwise=False)
 
-        if "accelerate" in peach_actions:
+        if ACTION_CONFIG.accelerate_action in peach_actions:
             game.peach.accelerate()
