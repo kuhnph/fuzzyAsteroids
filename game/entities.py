@@ -105,7 +105,6 @@ class Peach(GameObject):
             acceleration = self.ACCELERATION
         self.velocity += self.direction * acceleration - self.velocity * self.DAMPENING
 
-
 class Asteroid(GameObject):
     def __init__(self, position, create_asteroid_callback, size=GameSettings.ASTEROID_START_SIZE):
         self.create_asteroid_callback = create_asteroid_callback
@@ -153,6 +152,24 @@ class Target(GameObject):
 
     def capture(self):
         self.capture_life -= GameSettings.CAPTURE_DECREMENT
+
+
+# class PseudoTarget:
+#     def __init__(self, position):
+#         self.position = Vector2(position)
+
+#     def set_position(self, position):
+#         self.position.update(position)
+
+#     def draw(self, surface):
+#         # Optional visual marker for debugging
+#         pygame.draw.circle(
+#             surface,
+#             "yellow",
+#             self.position,
+#             6,
+#             width=2,
+#         )
 
 
 def text_to_screen(

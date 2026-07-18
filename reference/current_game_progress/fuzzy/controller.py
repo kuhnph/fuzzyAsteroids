@@ -118,10 +118,6 @@ class FuzzyController:
         ship_actions = list(self.chromosome_config.ship_actions)
         peach_actions = [peach_move, peach_turn]
 
-        # if self.debugCount % 10 == 0:
-            # print(f"{peach_actions[0]}, {peach_actions[1]}")
-            # print(f"speed = {speed} | speed value = {speed_value}")
-
         self.debugCount+=1
         return ship_actions, peach_actions
 

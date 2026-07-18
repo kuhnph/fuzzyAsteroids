@@ -15,6 +15,7 @@ class SpaceRocks:
     max_train_ticks = GameSettings.MAX_TICKS
     START_CAPTURE_LIFE = GameSettings.START_CAPTURE_LIFE
     margin = GameSettings.POSITION_MARGIN
+
     PEACH_POSITION = (random.uniform(margin, SCREEN_WIDTH - margin), random.uniform(margin, SCREEN_HEIGHT - margin))
     TARGET_POSITION = (random.uniform(margin, SCREEN_WIDTH - margin), random.uniform(margin, SCREEN_HEIGHT - margin))
 
@@ -53,7 +54,7 @@ class SpaceRocks:
         self.capture_agents = [self.peach]
 
         self.target = Target(self.TARGET_POSITION, self.START_CAPTURE_LIFE)
-
+        
         # Training / episode bookkeeping
         self.ticks = 0
         self.current_life = self.START_CAPTURE_LIFE
@@ -90,8 +91,8 @@ class SpaceRocks:
         """
         Soft reset for training.
         """
-        peach_initial_position = self.random_position_away()
-        target_initial_position = self.random_position_away()
+        peach_initial_position = Vector2(int(SCREEN_WIDTH/2), int(SCREEN_HEIGHT)/2)
+        target_initial_position = Vector2(int(SCREEN_WIDTH/2+100), int(SCREEN_HEIGHT)/2+100)
         self.initial_position_error = target_initial_position.distance_to(peach_initial_position)
 
         self.peach = Peach(peach_initial_position)
@@ -131,6 +132,7 @@ class SpaceRocks:
         When the target is fully captured, move it to a new random spot
         and reset capture life.
         """
+
         if self.current_life < 0:
             self.target = Target(get_random_position(self.screen), self.START_CAPTURE_LIFE)
 
@@ -264,16 +266,6 @@ class SpaceRocks:
 
         return Vector2(x,y)
     
-    # def random_position_away(self, margin=80, min_distance = 100, max_attempts=100):
-    #     object_positions = [object_position.position for object_position in self._get_game_objects()]
-
-    #     for _ in range(max_attempts):                                      #loop up to this many times
-    #         candidate = self.random_position()               #define a random position for a guy
-    #         for object_position in object_positions:                #loop through the game object positions
-    #             if candidate.distance_to(object_position) >= min_distance:  #return candidate position if it meets the requirements
-    #                 return candidate
-        
-    #     return self.random_position()    #return candidate anyway know we gave it the ole college try
     def random_position_away(
         self,
         margin=GameSettings.RANDOM_POSITION_MARGIN,
