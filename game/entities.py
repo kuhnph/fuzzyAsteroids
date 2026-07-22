@@ -123,13 +123,14 @@ class Asteroid(GameObject):
                 sprite,
                 get_random_velocity(GameSettings.ASTEROID_MIN_SPEED, GameSettings.ASTEROID_MAX_SPEED),
             )
-        #Single unmoving asteroid case
+        #Two unmoving asteroid case
         else:
             super().__init__(
-                Vector2(GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2),
+                position,
                 sprite,
                 (0,0),
             )
+    
 
 
     def split(self):

@@ -69,7 +69,7 @@ class SpaceRocks:
         pygame.display.set_caption(GameSettings.WINDOW_CAPTION)
 
     def spawn_initial_asteroids(self, count=1):
-        for _ in range(count):
+        for i in range(count):
             while True:
                 position = get_random_position(self.screen)
 
@@ -84,7 +84,13 @@ class SpaceRocks:
 
                 if far_from_ship and far_from_peach:
                     break
-
+            
+            #Testing two unmoving asteroids
+            test_asteroid_position = [[GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2],
+                                      [GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2+90],
+                                      [GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2-90],
+                                      [GameSettings.SCREEN_WIDTH/2+400, GameSettings.SCREEN_HEIGHT/2],]
+            position = test_asteroid_position[i]
             self.asteroids.append(Asteroid(position, self.asteroids.append))
 
     def reset_episode(self):

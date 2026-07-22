@@ -64,10 +64,10 @@ maxLookAhead = 10
 
 pseudo_target_distance = FuzzyVariable(
     name="pseudo_target_distance",
-    minimum=1,
+    minimum=0.1,
     maximum=maxLookAhead,
     sets={
-        "short": LeftShoulderSet("short",1,maxLookAhead*0.35,),
+        "short": LeftShoulderSet("short",0.1,maxLookAhead*0.35,),
         "medium": TriangularSet("medium",maxLookAhead*0.20,maxLookAhead*0.50,maxLookAhead*0.80,),
         "long": RightShoulderSet("long",maxLookAhead*0.65,maxLookAhead,)
     }

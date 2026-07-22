@@ -15,7 +15,7 @@ class GameSettings:
     START_CAPTURE_LIFE: int = 10
     CAPTURE_DECREMENT: float = 0.1
 
-    INITIAL_ASTEROID_COUNT: int = 1
+    INITIAL_ASTEROID_COUNT: int = 4
     POSITION_MARGIN: int = 20
     RANDOM_POSITION_MARGIN: int = 80
     RANDOM_AWAY_MIN_DISTANCE: int = 200
@@ -33,7 +33,7 @@ class GameSettings:
 
     ASTEROID_MIN_SPEED: int = 1
     ASTEROID_MAX_SPEED: int = 3
-    ASTEROID_START_SIZE: int = 3
+    ASTEROID_START_SIZE: int = 2
     ASTEROID_SPLIT_COUNT: int = 2
     ASTEROID_SIZE_TO_SCALE: ClassVar[dict[int, float]] = {
         3: 1.0,
