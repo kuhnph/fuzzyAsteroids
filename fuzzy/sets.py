@@ -31,6 +31,7 @@ class LeftShoulderSet:
         """
         self.name = name
         self.left = left
+        self.center = left
         self.right = right
 
     def membership(self, x):
@@ -51,6 +52,7 @@ class RightShoulderSet:
         """
         self.name = name
         self.left = left
+        self.center = right
         self.right = right
 
     def membership(self, x):
