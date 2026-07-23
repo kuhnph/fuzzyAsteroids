@@ -89,7 +89,7 @@ class Peach(GameObject):
         if not TEST:
             super().__init__(position, load_sprite("spaceship"), Vector2(0, 0))
         else:
-            super().__init__((GameSettings.SCREEN_WIDTH/2-400,GameSettings.SCREEN_HEIGHT/2), load_sprite("spaceship"), Vector2(0, 0))
+            super().__init__((GameSettings.SCREEN_WIDTH/2-400,GameSettings.SCREEN_HEIGHT/2+200), load_sprite("spaceship"), Vector2(0, 0))
 
     def rotate(self, clockwise=True):
         sign = 1 if clockwise else -1

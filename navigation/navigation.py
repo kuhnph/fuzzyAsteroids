@@ -1,13 +1,14 @@
 from pygame.math import Vector2
 from game.settings import GameSettings
 from navigation.testFuzzyNavigation import look_ahead, avoidance
+from navigation.settings import NavigationSettings
 import math
 
 class Navigation:
     def __init__(self):
         self.position = Vector2(0,0)
         self.margin = 10
-        self.max_avoidance_distance = 50
+        self.max_avoidance_distance = NavigationSettings.MAX_AVOIDANCE_DISTANCE
 
         self.asteroid_states = []
         self.relevant_asteroids = []
@@ -16,11 +17,13 @@ class Navigation:
         self.target_position = Vector2(0,0)
         self.target_direction = Vector2(0,0)
         self.target_distance = 0
+        self.counter = 0
 
     def choose_pseudo_target(self,game_state):
         '''
         Basically the navigation algorithm
         '''
+
         self.calculate_navigation_states(game_state)
         self.filter_asteroids()
         selected_asteroid = self.select_asteroid()
@@ -30,6 +33,7 @@ class Navigation:
             avoidance_offset,
             pseudo_target_distance)
 
+        self.counter += 1
 
     def calculate_navigation_states(self, game_state):
         """
@@ -116,10 +120,11 @@ class Navigation:
         if not self.relevant_asteroids:
             return None
 
-        return min(
-            self.relevant_asteroids,
-            key=lambda asteroid: asteroid["clearance"]
-        )
+        selected_asteroid = min(
+            self.relevant_asteroids, key=lambda asteroid: asteroid["clearance"]
+            )
+
+        return selected_asteroid
 
     def calculate_avoidance_offset(self, selected_asteroid):
         """

@@ -4,6 +4,7 @@ from fuzzy.rules import FuzzyRule
 from fuzzy.controller import FuzzyController
 from fuzzy.defuzz import weighted_average
 from game.settings import GameSettings
+from navigation.settings import NavigationSettings
 import math
 
 
@@ -28,7 +29,7 @@ target_distance = FuzzyVariable(
 )
 
 
-max_avoidance_distance = 100
+max_avoidance_distance = NavigationSettings.MAX_AVOIDANCE_DISTANCE
 
 asteroid_clearance = FuzzyVariable(
     name="asteroid_clearance",
