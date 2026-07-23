@@ -28,7 +28,7 @@ target_distance = FuzzyVariable(
 )
 
 
-max_avoidance_distance = 400
+max_avoidance_distance = 100
 
 asteroid_clearance = FuzzyVariable(
     name="asteroid_clearance",
@@ -60,7 +60,7 @@ asteroid_bearing = FuzzyVariable(
 # Outputs
 # -------------------------
 
-maxLookAhead = 10
+maxLookAhead = 400
 
 pseudo_target_distance = FuzzyVariable(
     name="pseudo_target_distance",

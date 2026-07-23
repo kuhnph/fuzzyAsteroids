@@ -9,7 +9,7 @@ class GameSettings:
     SCREEN_WIDTH: int = int(1920 / 1.5)
     SCREEN_HEIGHT: int = int(1080 / 1.5)
     WINDOW_CAPTION: str = "Space Rocks"
-    DEFAULT_FPS: int = 1000/10
+    DEFAULT_FPS: int = 1000/20
 
     MIN_ASTEROID_DISTANCE: int = 250
     START_CAPTURE_LIFE: int = 10
