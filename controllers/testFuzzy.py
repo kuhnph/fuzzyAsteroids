@@ -28,6 +28,7 @@ distance_error = FuzzyVariable(
     minimum=0,
     maximum=250,
     sets={
+        "here": LeftShoulderSet("near", 0, 5),
         "near": LeftShoulderSet("near", 0, 50),
         "medium": TriangularSet("medium", 50, 100, 150),
         "far": RightShoulderSet("far", 125, 250),
@@ -68,8 +69,8 @@ desired_speed = FuzzyVariable(
     minimum=0,
     maximum=5,
     sets={
-        "stop": TriangularSet("stop", 0, 0, 1),
-        "slow": TriangularSet("slow", 0.5, 1.5, 2.5),
+        "stop": LeftShoulderSet("stop", 0, .5),
+        "slow": TriangularSet("slow", 0.2, 1.5, 2.5),
         "medium": TriangularSet("medium", 2.0, 3.0, 4.0),
         "fast": TriangularSet("fast", 3.5, 5.0, 5.0),
     },
@@ -123,6 +124,12 @@ rules = [
             ("distance_error", "near"),
         ],
         consequents=[("desired_speed", "slow")],
+    ),
+    FuzzyRule(
+        antecedents=[
+            ("distance_error", "here"),
+        ],
+        consequents=[("desired_speed", "stop")],
     ),
     FuzzyRule(
         antecedents=[

@@ -104,7 +104,23 @@ class Navigation:
                 predicted_separation = asteroid_distance
             predicted_clearance = (predicted_separation - effective_radius)
 
+            #Checking target relative to asteroids
+            to_target_from_asteroid = self.target_position - asteroid_position
+            asteroid_target_distance = to_target_from_asteroid.length()
+            asteroid_target_clearance = asteroid_target_distance - effective_radius
 
+            peach_speed = peach_velocity.length()
+            if peach_speed > 0:
+                time_to_target = self.target_distance / peach_speed    
+            else:
+                time_to_target = float("inf")
+
+            if time_to_target != float('inf'):
+                asteroid_position_at_target_arrival = asteroid_position + asteroid_velocity*time_to_target
+                predicted_target_distance = (asteroid_position_at_target_arrival - self.target_position).length()
+                predicted_target_clearance = predicted_target_distance - effective_radius
+            else:
+                predicted_target_clearance = asteroid_target_clearance
 
             self.asteroid_states.append({
                 "index": i,
@@ -123,23 +139,29 @@ class Navigation:
                 "time_to_closest": time_to_closest,
                 "predicted_separation": predicted_separation,
                 "predicted_clearance": predicted_clearance,
+                "target_clearance": asteroid_target_clearance,
+                "predicted_target_clearance": predicted_target_clearance
             })
         #Debug
-        if self.counter % 100 == 0:
-            print('here')
+        # if self.counter % 100 == 0:
+        #     print('here')
 
     def filter_asteroids(self):
-        '''
-        remove asteroids not on peach path
-        '''
         self.relevant_asteroids = []
 
         for asteroid_state in self.asteroid_states:
-            if asteroid_state["clearance"] >self. max_avoidance_distance:
-                continue
-            if asteroid_state["along_velocity"] <= 0:
-                continue
-            if not asteroid_state["on_velocity_path"]:
+            trajectory_threat = (
+                asteroid_state["time_to_closest"] > 0
+                and asteroid_state["closing_speed"] > 0
+                and asteroid_state["predicted_clearance"] < self.max_avoidance_distance
+            )
+
+            target_threat = (
+                asteroid_state["predicted_target_clearance"]
+                < self.max_avoidance_distance
+            )
+
+            if not trajectory_threat and not target_threat:
                 continue
 
             self.relevant_asteroids.append(asteroid_state)
@@ -218,9 +240,6 @@ class Navigation:
         navigation_direction = (
             self.target_direction.rotate(avoidance_offset)
         )
-
-        #Debug
-        navigation_direction = self.target_direction
 
         return (
             self.peach_position

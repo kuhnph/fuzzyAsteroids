@@ -31,6 +31,7 @@ class SpaceRocks:
             If False, only Peach exists.
         """
         #Game stuffs
+        self.margin = GameSettings.POSITION_MARGIN
         self.user_input = user_input
         self.enable_player = enable_player
         self.render = render
@@ -87,8 +88,11 @@ class SpaceRocks:
             
             #Testing two unmoving asteroids
             test_asteroid_position = [[GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2-300],
-                                      [GameSettings.SCREEN_WIDTH/2+400, GameSettings.SCREEN_HEIGHT/2]]
-            test_asteroid_velocity = [(-.55,2), (0,0)]
+                                      [GameSettings.SCREEN_WIDTH/2+400, GameSettings.SCREEN_HEIGHT/2],
+                                      [GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2],
+                                      [GameSettings.SCREEN_WIDTH/2-600, GameSettings.SCREEN_HEIGHT/2],]
+
+            test_asteroid_velocity = [(-.55,2), (0,0), (0,0), (1,0.1)]
 
             position = test_asteroid_position[i]
             velocity = test_asteroid_velocity[i]
@@ -141,7 +145,7 @@ class SpaceRocks:
         """
 
         if self.current_life < 0:
-            self.target = Target(get_random_position(self.screen), self.START_CAPTURE_LIFE)
+            self.target = Target((random.uniform(self.margin, self.SCREEN_WIDTH - self.margin), random.uniform(self.margin, self.SCREEN_HEIGHT - self.margin)), GameSettings.START_CAPTURE_LIFE)
 
     def _process_game_logic(self):
         # Move all active game objects

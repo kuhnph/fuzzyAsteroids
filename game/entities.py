@@ -8,7 +8,7 @@ from .settings import GameSettings
 UP = Vector2(0, -1)
 RIGHT = Vector2(1, 0)
 #Single unmoving asteroid case
-TEST = True
+TEST = False
 
 
 class GameObject:
