@@ -63,12 +63,15 @@ class Navigation:
         self.asteroid_states = []
         for i, a in enumerate(game_state['asteroids']):
             asteroid_position = Vector2(a['position'])
+
             to_asteroid = asteroid_position - self.peach_position
             asteroid_distance = to_asteroid.length()
             if asteroid_distance > 0:
                 to_asteroid_direction = to_asteroid.normalize()
             else:
                 to_asteroid_direction = Vector2(0,0)
+
+
             asteroid_bearing = self.target_direction.angle_to(to_asteroid_direction)
             effective_radius = peach['radius'] + a['radius'] + self.margin
             asteroid_clearance = asteroid_distance - effective_radius
@@ -81,9 +84,32 @@ class Navigation:
             cross_track_distance = (asteroid_position - closest_point).length()
             asteroid_on_velocity_path = (asteroid_along_velocity > 0 and cross_track_distance < effective_radius)
 
+
+            #Calculate asteroid velocity stuffs that might be useful
+            asteroid_velocity = Vector2(a['velocity'])
+
+            relative_velocity = asteroid_velocity - peach_velocity
+            closing_speed = -relative_velocity.dot(to_asteroid_direction)
+
+            relative_speed_squared = relative_velocity.length_squared()
+            if relative_speed_squared > 0:
+                time_to_closest = -to_asteroid.dot(relative_velocity) / relative_speed_squared
+            else:
+                time_to_closest = float("inf")
+
+            if time_to_closest > 0:
+                closest_relative_position = (to_asteroid + relative_velocity * time_to_closest)
+                predicted_separation = (closest_relative_position.length())
+            else:
+                predicted_separation = asteroid_distance
+            predicted_clearance = (predicted_separation - effective_radius)
+
+
+
             self.asteroid_states.append({
                 "index": i,
                 "position": asteroid_position,
+                "velocity": asteroid_velocity,
                 "distance": asteroid_distance,
                 "clearance": asteroid_clearance,
                 "bearing": asteroid_bearing,
@@ -92,7 +118,15 @@ class Navigation:
                 "cross_track": cross_track_distance,
                 "on_velocity_path": asteroid_on_velocity_path,
                 "effective_radius": effective_radius,
+                "relative_velocity": relative_velocity,
+                "closing_speed": closing_speed,
+                "time_to_closest": time_to_closest,
+                "predicted_separation": predicted_separation,
+                "predicted_clearance": predicted_clearance,
             })
+        #Debug
+        if self.counter % 100 == 0:
+            print('here')
 
     def filter_asteroids(self):
         '''
@@ -184,6 +218,9 @@ class Navigation:
         navigation_direction = (
             self.target_direction.rotate(avoidance_offset)
         )
+
+        #Debug
+        navigation_direction = self.target_direction
 
         return (
             self.peach_position

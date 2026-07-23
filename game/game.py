@@ -86,12 +86,13 @@ class SpaceRocks:
                     break
             
             #Testing two unmoving asteroids
-            test_asteroid_position = [[GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2],
-                                      [GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2+90],
-                                      [GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2-90],
-                                      [GameSettings.SCREEN_WIDTH/2+400, GameSettings.SCREEN_HEIGHT/2],]
+            test_asteroid_position = [[GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2-300],
+                                      [GameSettings.SCREEN_WIDTH/2+400, GameSettings.SCREEN_HEIGHT/2]]
+            test_asteroid_velocity = [(-.55,2), (0,0)]
+
             position = test_asteroid_position[i]
-            self.asteroids.append(Asteroid(position, self.asteroids.append))
+            velocity = test_asteroid_velocity[i]
+            self.asteroids.append(Asteroid(position, velocity, self.asteroids.append))
 
     def reset_episode(self):
         """

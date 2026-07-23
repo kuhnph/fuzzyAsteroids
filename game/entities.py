@@ -89,7 +89,7 @@ class Peach(GameObject):
         if not TEST:
             super().__init__(position, load_sprite("spaceship"), Vector2(0, 0))
         else:
-            super().__init__((GameSettings.SCREEN_WIDTH/2-400,GameSettings.SCREEN_HEIGHT/2+200), load_sprite("spaceship"), Vector2(0, 0))
+            super().__init__((GameSettings.SCREEN_WIDTH/2-400,GameSettings.SCREEN_HEIGHT/2), load_sprite("spaceship"), Vector2(0, 0))
 
     def rotate(self, clockwise=True):
         sign = 1 if clockwise else -1
@@ -109,7 +109,7 @@ class Peach(GameObject):
         self.velocity += self.direction * acceleration - self.velocity * self.DAMPENING
 
 class Asteroid(GameObject):
-    def __init__(self, position, create_asteroid_callback, size=GameSettings.ASTEROID_START_SIZE):
+    def __init__(self, position,velocity, create_asteroid_callback, size=GameSettings.ASTEROID_START_SIZE):
         self.create_asteroid_callback = create_asteroid_callback
         self.size = size
 
@@ -123,12 +123,12 @@ class Asteroid(GameObject):
                 sprite,
                 get_random_velocity(GameSettings.ASTEROID_MIN_SPEED, GameSettings.ASTEROID_MAX_SPEED),
             )
-        #Two unmoving asteroid case
+        #moving down asteroid
         else:
             super().__init__(
                 position,
                 sprite,
-                (0,0),
+                velocity,
             )
     
 
