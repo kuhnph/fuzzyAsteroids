@@ -3,7 +3,7 @@ import random
 from pygame.math import Vector2
 
 from .entities import Spaceship, Peach, Asteroid, Bullet, Target
-from .assets import load_sprite, get_random_position
+from .assets import load_sprite, get_random_position, get_random_velocity
 from .input_handlers import handle_manual_input, apply_agent_actions
 from .settings import GameSettings
 
@@ -71,31 +71,22 @@ class SpaceRocks:
 
     def spawn_initial_asteroids(self, count=1):
         for i in range(count):
-            while True:
-                position = get_random_position(self.screen)
+            # while True:
+            position = self.random_position_away()
+            velocity = get_random_velocity(GameSettings.ASTEROID_MIN_SPEED, GameSettings.ASTEROID_MAX_SPEED)
 
-                far_from_ship = (
-                    True if self.spaceship is None
-                    else position.distance_to(self.spaceship.position) > self.MIN_ASTEROID_DISTANCE
-                )
-                far_from_peach = (
-                    True if self.peach is None
-                    else position.distance_to(self.peach.position) > self.MIN_ASTEROID_DISTANCE
-                )
+                # far_from_ship = (
+                #     True if self.spaceship is None
+                #     else position.distance_to(self.spaceship.position) > self.MIN_ASTEROID_DISTANCE
+                # )
+                # far_from_peach = (
+                #     True if self.peach is None
+                #     else position.distance_to(self.peach.position) > self.MIN_ASTEROID_DISTANCE
+                # )
 
-                if far_from_ship and far_from_peach:
-                    break
-            
-            #Testing two unmoving asteroids
-            test_asteroid_position = [[GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2-300],
-                                      [GameSettings.SCREEN_WIDTH/2+400, GameSettings.SCREEN_HEIGHT/2],
-                                      [GameSettings.SCREEN_WIDTH/2, GameSettings.SCREEN_HEIGHT/2],
-                                      [GameSettings.SCREEN_WIDTH/2-600, GameSettings.SCREEN_HEIGHT/2],]
+                # if far_from_ship and far_from_peach:
+                #     break
 
-            test_asteroid_velocity = [(-.55,2), (0,0), (0,0), (1,0.1)]
-
-            position = test_asteroid_position[i]
-            velocity = test_asteroid_velocity[i]
             self.asteroids.append(Asteroid(position, velocity, self.asteroids.append))
 
     def reset_episode(self):

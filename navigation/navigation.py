@@ -23,6 +23,9 @@ class Navigation:
         '''
         Basically the navigation algorithm
         '''
+        if game_state.get("peach") is None:
+            self.position = None
+            return None
 
         self.calculate_navigation_states(game_state)
         self.filter_asteroids()

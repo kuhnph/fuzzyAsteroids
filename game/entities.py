@@ -7,8 +7,7 @@ from .settings import GameSettings
 
 UP = Vector2(0, -1)
 RIGHT = Vector2(1, 0)
-#Single unmoving asteroid case
-TEST = False
+
 
 
 class GameObject:
@@ -84,12 +83,7 @@ class Peach(GameObject):
 
     def __init__(self, position):
         self.direction = Vector2(RIGHT)
-
-        #Single unmoving asteroid case
-        if not TEST:
-            super().__init__(position, load_sprite("spaceship"), Vector2(0, 0))
-        else:
-            super().__init__((GameSettings.SCREEN_WIDTH/2-400,GameSettings.SCREEN_HEIGHT/2), load_sprite("spaceship"), Vector2(0, 0))
+        super().__init__(position, load_sprite("spaceship"), Vector2(0, 0))
 
     def rotate(self, clockwise=True):
         sign = 1 if clockwise else -1
@@ -116,21 +110,13 @@ class Asteroid(GameObject):
         scale = GameSettings.ASTEROID_SIZE_TO_SCALE[size]
         sprite = rotozoom(load_sprite("asteroid"), 0, scale)
 
-        #Testing stuff
-        if not TEST:
-            super().__init__(
-                position,
-                sprite,
-                get_random_velocity(GameSettings.ASTEROID_MIN_SPEED, GameSettings.ASTEROID_MAX_SPEED),
-            )
-        #moving down asteroid
-        else:
-            super().__init__(
-                position,
-                sprite,
-                velocity,
-            )
-    
+
+        super().__init__(
+            position,
+            sprite,
+            get_random_velocity(GameSettings.ASTEROID_MIN_SPEED, GameSettings.ASTEROID_MAX_SPEED),
+        )
+
 
 
     def split(self):
@@ -154,11 +140,7 @@ class Target(GameObject):
         self.capture_life = capture_life
         sprite = rotozoom(load_sprite("target"), 0, GameSettings.TARGET_SCALE)
 
-        #Single unmoving asteroid case
-        if not TEST:
-            super().__init__(position, sprite, Vector2(0, 0))
-        else:
-            super().__init__((GameSettings.SCREEN_WIDTH/2+200,GameSettings.SCREEN_HEIGHT/2), sprite, Vector2(0, 0))
+        super().__init__(position, sprite, Vector2(0, 0))
 
     def draw(self, surface):
         blit_position = self.position - Vector2(self.radius)
