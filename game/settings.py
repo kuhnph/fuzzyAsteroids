@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import ClassVar
+
+import pygame
+
+pygame.init()
+_display = pygame.display.Info()
+
 
 
 @dataclass
 class GameSettings:
-    SCREEN_WIDTH: int = int(1920 / 1.5)
-    SCREEN_HEIGHT: int = int(1080 / 1.5)
+    SCREEN_WIDTH = int(_display.current_w * 0.75)
+    SCREEN_HEIGHT = int(_display.current_h * 0.75)
     WINDOW_CAPTION: str = "Space Rocks"
     DEFAULT_FPS: int = 1000/10
 
@@ -15,7 +22,7 @@ class GameSettings:
     START_CAPTURE_LIFE: int = 10
     CAPTURE_DECREMENT: float = 0.1
 
-    INITIAL_ASTEROID_COUNT: int = 5
+    INITIAL_ASTEROID_COUNT: int = 8
     POSITION_MARGIN: int = 200
     RANDOM_POSITION_MARGIN: int = 80
     RANDOM_AWAY_MIN_DISTANCE: int = 200
